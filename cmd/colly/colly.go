@@ -29,7 +29,7 @@ var scraperHeadTemplate = `package main
 import (
 	"log"
 
-	"github.com/gocolly/colly"
+	"github.com/okovelkov/colly"
 )
 
 func main() {
