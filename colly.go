@@ -1261,9 +1261,19 @@ func (j *cookieJarSerializer) SetCookies(u *url.URL, cookies []*http.Cookie) {
 	defer j.lock.Unlock()
 	cookieStr := j.store.Cookies(u)
 
+	uniqueCookiesMap := map[string]*http.Cookie{}
+	for _, c := range cookies {
+		uniqueCookiesMap[fmt.Sprintf("%s;%s;%s", c.Domain, c.Path, c.Name)] = c
+	}
+
+	uniqueCookies := make([]*http.Cookie, 0, len(uniqueCookiesMap))
+	for _, value := range uniqueCookiesMap {
+		uniqueCookies = append(uniqueCookies, value)
+	}
+
 	// Merge existing cookies, new cookies have precedence.
-	cnew := make([]*http.Cookie, len(cookies))
-	copy(cnew, cookies)
+	cnew := make([]*http.Cookie, len(uniqueCookies))
+	copy(cnew, uniqueCookies)
 	existing := storage.UnstringifyCookies(cookieStr)
 	for _, c := range existing {
 		if !storage.ContainsCookie(cnew, c.Name) {
